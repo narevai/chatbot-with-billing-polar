@@ -16,6 +16,8 @@ node_modules
 # Testing
 coverage
 /test-results/
+/playwright-report/
+/blob-report/
 
 # Vercel
 .vercel
@@ -31,9 +33,11 @@ dist
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+.pnpm-debug.log*
 
 # Misc
 .DS_Store
 *.pem
 /playwright/*
 next-env.d.ts
+tsconfig.tsbuildinfo
