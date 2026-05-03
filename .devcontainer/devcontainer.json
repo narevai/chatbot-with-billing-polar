@@ -1,6 +1,6 @@
 {
   "name": "narevai/chatbot-with-billing dev",
-  "image": "mcr.microsoft.com/devcontainers/typescript-node:22",
+  "image": "mcr.microsoft.com/devcontainers/typescript-node:22-bookworm",
   "features": {
     "ghcr.io/devcontainers/features/node:1": {
       "pnpmVersion": "latest"
@@ -8,10 +8,7 @@
   },
   "customizations": {
     "vscode": {
-      "extensions": [
-        "oxc.oxc-vscode",
-        "christian-kohler.npm-intellisense"
-      ]
+      "extensions": ["oxc.oxc-vscode", "christian-kohler.npm-intellisense"]
     }
   },
   "postCreateCommand": "corepack enable && corepack prepare pnpm@latest --activate && pnpm install",

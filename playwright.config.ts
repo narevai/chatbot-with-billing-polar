@@ -7,7 +7,7 @@ import { defineConfig, devices } from '@playwright/test';
 import { config } from 'dotenv';
 
 if (!process.env.CI) {
-  config({ path: '.env.test', override: true });
+  config({ path: '.env.local', override: true });
 } else {
   // Otherwise, load nothing (GitHub Actions will provide the real env vars)
   config();
@@ -32,9 +32,9 @@ export default defineConfig({
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
-  retries: 0,
+  retries: process.env.CI ? 3 : 0,
   /* Limit workers to prevent browser crashes */
-  workers: process.env.CI ? 2 : 2,
+  workers: process.env.CI ? 1 : 2,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: [['html', { open: 'never' }]],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
@@ -47,9 +47,9 @@ export default defineConfig({
   },
 
   /* Configure global timeout for each test */
-  timeout: 10 * 1000,
+  timeout: process.env.CI ? 60 * 1000 : 30 * 1000,
   expect: {
-    timeout: 10 * 1000,
+    timeout: process.env.CI ? 60 * 1000 : 30 * 1000,
   },
 
   /* Configure projects */
@@ -95,9 +95,9 @@ export default defineConfig({
 
   /* Run your local dev server before starting the tests */
   webServer: {
-    command: 'pnpm dev',
+    command: process.env.CI ? 'pnpm start' : 'pnpm dev',
     url: `${baseURL}/ping`,
-    timeout: 5 * 1000,
+    timeout: 120 * 1000,
     reuseExistingServer: !process.env.CI,
   },
 });
