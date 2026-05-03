@@ -11,7 +11,7 @@ const targetDir = path.resolve(__dirname, '..');
 
 // Configuration
 const REPO_URL = 'https://github.com/narevai/ai-billing.git';
-const BRANCH = 'feat/example-chatbot-with-billing';
+const BRANCH = 'main';
 const SOURCE_SUBDIR = 'examples/chatbot-with-billing-polar';
 
 async function main() {
@@ -128,7 +128,7 @@ async function main() {
     updateDependencies(targetPkg.devDependencies);
 
     // Optional: remove private flag or update name
-    targetPkg.name = 'chatbot-template';
+    targetPkg.name = 'chatbot-with-billing-polar';
     delete targetPkg.private;
 
     await fs.writeFile(
