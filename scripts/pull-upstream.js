@@ -41,10 +41,7 @@ async function main() {
     }
 
     // 2.5 Copy root configuration files from the cloned repo
-    const rootFilesToCopy = [
-      'LICENSE',
-      '.oxfmtrc.jsonc',
-    ];
+    const rootFilesToCopy = ['LICENSE', '.oxfmtrc.jsonc'];
     for (const file of rootFilesToCopy) {
       try {
         await fs.cp(path.join(tempRepoDir, file), path.join(targetDir, file));
