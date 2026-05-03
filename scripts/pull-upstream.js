@@ -44,8 +44,6 @@ async function main() {
     const rootFilesToCopy = [
       'LICENSE',
       '.oxfmtrc.jsonc',
-      '.oxlintrc.json',
-      '.gitignore',
     ];
     for (const file of rootFilesToCopy) {
       try {

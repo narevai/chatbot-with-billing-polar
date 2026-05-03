@@ -1,8 +1,6 @@
 {
   "$schema": "https://raw.githubusercontent.com/oxc-project/oxc/main/npm/oxlint/configuration_schema.json",
-  "plugins": [
-    "typescript"
-  ],
+  "plugins": ["typescript"],
   "categories": {
     "correctness": "warn",
     "suspicious": "warn"
@@ -12,9 +10,5 @@
     "eslint/no-loss-of-precision": "off",
     "eslint/no-unused-vars": "off"
   },
-  "ignorePatterns": [
-    "**/dist/**",
-    "**/coverage/**",
-    "**/.next/**"
-  ]
+  "ignorePatterns": ["**/dist/**", "**/coverage/**", "**/.next/**"]
 }
