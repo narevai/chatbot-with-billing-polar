@@ -11,7 +11,7 @@ const targetDir = path.resolve(__dirname, '..');
 
 // Configuration
 const REPO_URL = 'https://github.com/narevai/ai-billing.git';
-const BRANCH = 'main';
+const BRANCH = 'docs/polar-billing-template-sync';
 const SOURCE_SUBDIR = 'examples/chatbot-with-billing-polar';
 
 async function main() {
