@@ -1,6 +1,10 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { getToken } from 'next-auth/jwt';
-import { guestRegex, isDevelopmentEnvironment, isTestEnvironment } from './lib/constants';
+import {
+  guestRegex,
+  isDevelopmentEnvironment,
+  isTestEnvironment,
+} from './lib/constants';
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
