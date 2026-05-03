@@ -6,7 +6,7 @@ import os from 'os';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 // Adjust this if your script is in the root instead of a `scripts/` folder:
-// const targetDir = __dirname; 
+// const targetDir = __dirname;
 const targetDir = path.resolve(__dirname, '..');
 
 // Configuration
@@ -21,7 +21,10 @@ async function main() {
 
   try {
     // 1. Clone the repository (depth 1 for speed)
-    execSync(`git clone --depth 1 --branch ${BRANCH} ${REPO_URL} ${tempRepoDir}`, { stdio: 'inherit' });
+    execSync(
+      `git clone --depth 1 --branch ${BRANCH} ${REPO_URL} ${tempRepoDir}`,
+      { stdio: 'inherit' },
+    );
 
     const sourceDir = path.join(tempRepoDir, SOURCE_SUBDIR);
     console.log(`Copying template from ${sourceDir} to ${targetDir}...`);
@@ -31,27 +34,45 @@ async function main() {
     const filesToCopy = await fs.readdir(sourceDir);
     for (const file of filesToCopy) {
       if (['node_modules', '.next', 'dist', '.turbo'].includes(file)) continue;
-      await fs.cp(path.join(sourceDir, file), path.join(targetDir, file), { recursive: true, force: true });
+      await fs.cp(path.join(sourceDir, file), path.join(targetDir, file), {
+        recursive: true,
+        force: true,
+      });
     }
 
     // 2.5 Copy root configuration files from the cloned repo
-    const rootFilesToCopy = ['LICENSE', '.oxfmtrc.jsonc', '.oxlintrc.json', '.gitignore'];
+    const rootFilesToCopy = [
+      'LICENSE',
+      '.oxfmtrc.jsonc',
+      '.oxlintrc.json',
+      '.gitignore',
+    ];
     for (const file of rootFilesToCopy) {
       try {
         await fs.cp(path.join(tempRepoDir, file), path.join(targetDir, file));
         console.log(`Copied ${file} from root.`);
       } catch (error) {
-        console.warn(`Warning: Could not copy ${file} from root:`, error.message);
+        console.warn(
+          `Warning: Could not copy ${file} from root:`,
+          error.message,
+        );
       }
     }
 
     // 3. Parse pnpm-workspace.yaml for catalog versions from the cloned repo
-    const workspaceYaml = await fs.readFile(path.join(tempRepoDir, 'pnpm-workspace.yaml'), 'utf-8');
-    const catalogSection = workspaceYaml.split('catalogs:')[1]?.split('default:')[1];
+    const workspaceYaml = await fs.readFile(
+      path.join(tempRepoDir, 'pnpm-workspace.yaml'),
+      'utf-8',
+    );
+    const catalogSection = workspaceYaml
+      .split('catalogs:')[1]
+      ?.split('default:')[1];
     const catalog = {};
     if (catalogSection) {
       for (const line of catalogSection.split('\n')) {
-        const match = line.match(/^\s+['"]?([^:'"]+)['"]?:\s*['"]?([^'"]+)['"]?/);
+        const match = line.match(
+          /^\s+['"]?([^:'"]+)['"]?:\s*['"]?([^'"]+)['"]?/,
+        );
         if (match) {
           catalog[match[1]] = match[2];
         }
@@ -76,22 +97,30 @@ async function main() {
     const targetPkgPath = path.join(targetDir, 'package.json');
     const targetPkg = JSON.parse(await fs.readFile(targetPkgPath, 'utf-8'));
 
-    const updateDependencies = (deps) => {
+    const updateDependencies = deps => {
       if (!deps) return;
       for (const [name, version] of Object.entries(deps)) {
         if (version === 'workspace:*' || version.startsWith('workspace:')) {
           if (workspaceVersions[name]) {
             deps[name] = `^${workspaceVersions[name]}`;
-            console.log(`Replaced workspace dependency ${name} with ^${workspaceVersions[name]}`);
+            console.log(
+              `Replaced workspace dependency ${name} with ^${workspaceVersions[name]}`,
+            );
           } else {
-            console.warn(`Warning: Workspace package ${name} not found in packages/`);
+            console.warn(
+              `Warning: Workspace package ${name} not found in packages/`,
+            );
           }
         } else if (version === 'catalog:') {
           if (catalog[name]) {
             deps[name] = catalog[name];
-            console.log(`Replaced catalog dependency ${name} with ${catalog[name]}`);
+            console.log(
+              `Replaced catalog dependency ${name} with ${catalog[name]}`,
+            );
           } else {
-            console.warn(`Warning: Catalog package ${name} not found in pnpm-workspace.yaml`);
+            console.warn(
+              `Warning: Catalog package ${name} not found in pnpm-workspace.yaml`,
+            );
           }
         }
       }
@@ -104,14 +133,16 @@ async function main() {
     targetPkg.name = 'chatbot-template';
     delete targetPkg.private;
 
-    await fs.writeFile(targetPkgPath, JSON.stringify(targetPkg, null, 2) + '\n');
+    await fs.writeFile(
+      targetPkgPath,
+      JSON.stringify(targetPkg, null, 2) + '\n',
+    );
     console.log('Updated package.json successfully.');
 
     // 6. Test the exported template
     console.log('\nTesting the pulled template by running pnpm install...');
     execSync('pnpm install', { cwd: targetDir, stdio: 'inherit' });
     console.log('\nTemplate pulled and tested successfully!');
-
   } catch (error) {
     console.error('\nFailed to pull and install dependencies:', error);
     process.exit(1);

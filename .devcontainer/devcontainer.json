@@ -8,10 +8,7 @@
   },
   "customizations": {
     "vscode": {
-      "extensions": [
-        "oxc.oxc-vscode",
-        "christian-kohler.npm-intellisense"
-      ]
+      "extensions": ["oxc.oxc-vscode", "christian-kohler.npm-intellisense"]
     }
   },
   "postCreateCommand": "corepack enable && corepack prepare pnpm@latest --activate && pnpm install",
