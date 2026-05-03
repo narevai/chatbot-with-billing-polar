@@ -10,11 +10,10 @@ jobs:
     timeout-minutes: 30
     runs-on: ubuntu-latest
     env:
-      BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
-      BETTER_AUTH_URL: ${{ secrets.BETTER_AUTH_URL }}
-      POSTGRES_URL: ${{ secrets.POSTGRES_URL }}
-      BLOB_READ_WRITE_TOKEN: ${{ secrets.BLOB_READ_WRITE_TOKEN }}
-      REDIS_URL: ${{ secrets.REDIS_URL }}
+      AUTH_SECRET: ${{ secrets.OSS_AUTH_SECRET }}
+      POSTGRES_URL: ${{ secrets.OSS_POSTGRES_URL }}
+      BLOB_READ_WRITE_TOKEN: ${{ secrets.OSS_BLOB_READ_WRITE_TOKEN }}
+      REDIS_URL: ${{ secrets.OSS_REDIS_URL }}
 
     steps:
       - uses: actions/checkout@v4
