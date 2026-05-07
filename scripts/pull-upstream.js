@@ -33,7 +33,7 @@ async function main() {
     // We iterate and copy so we don't overwrite the .git folder of the current repo
     const filesToCopy = await fs.readdir(sourceDir);
     for (const file of filesToCopy) {
-      if (['node_modules', '.next', 'dist', '.turbo'].includes(file)) continue;
+      if (['node_modules', '.next', 'dist', '.turbo', '.github'].includes(file)) continue;
       await fs.cp(path.join(sourceDir, file), path.join(targetDir, file), {
         recursive: true,
         force: true,
