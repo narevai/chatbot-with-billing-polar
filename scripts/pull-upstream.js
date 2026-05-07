@@ -31,33 +31,13 @@ async function main() {
 
     // 2. Copy files (excluding node_modules and build artifacts)
     // We iterate and copy so we don't overwrite the .git folder of the current repo
-    const UPSTREAM_SKIP = new Set(['node_modules', '.next', 'dist', '.turbo', '.github']);
-    const upstreamFiles = await fs.readdir(sourceDir);
-    const copiedFromUpstream = new Set();
-    for (const file of upstreamFiles) {
-      if (UPSTREAM_SKIP.has(file)) continue;
+    const filesToCopy = await fs.readdir(sourceDir);
+    for (const file of filesToCopy) {
+      if (['node_modules', '.next', 'dist', '.turbo', '.github'].includes(file)) continue;
       await fs.cp(path.join(sourceDir, file), path.join(targetDir, file), {
         recursive: true,
         force: true,
       });
-      copiedFromUpstream.add(file);
-    }
-
-    // 2b. Remove files from target that no longer exist in upstream
-    const ALWAYS_KEEP = new Set([
-      '.git', '.github', '.env', '.env.local', '.env.production',
-      'node_modules', '.next', '.pnpm-store', 'playwright-report',
-      'tsconfig.tsbuildinfo', 'next-env.d.ts',
-    ]);
-    const targetFiles = await fs.readdir(targetDir);
-    for (const file of targetFiles) {
-      if (ALWAYS_KEEP.has(file)) continue;
-      // Root files copied separately are also considered "from upstream"
-      const isFromUpstream = copiedFromUpstream.has(file) || ['LICENSE', '.oxfmtrc.jsonc'].includes(file);
-      if (!isFromUpstream) {
-        console.log(`Removing ${file} (no longer in upstream)...`);
-        await fs.rm(path.join(targetDir, file), { recursive: true, force: true });
-      }
     }
 
     // 2.5 Copy root configuration files from the cloned repo
