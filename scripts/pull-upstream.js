@@ -182,7 +182,7 @@ async function main() {
 
     // 6. Test the exported template
     console.log('\nTesting the pulled template by running pnpm install...');
-    execSync('pnpm install', { cwd: targetDir, stdio: 'inherit' });
+    execSync('pnpm install --no-lockfile', { cwd: targetDir, stdio: 'inherit' });
     console.log('\nTemplate pulled and tested successfully!');
   } catch (error) {
     console.error('\nFailed to pull and install dependencies:', error);
