@@ -29,6 +29,9 @@ jobs:
       - name: Run pull script
         run: node scripts/pull-upstream.js
 
+      - name: Discard pnpm-lock.yaml changes
+        run: git checkout -- pnpm-lock.yaml || true
+
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v7
         with:
