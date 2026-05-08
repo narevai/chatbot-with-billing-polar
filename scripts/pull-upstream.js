@@ -29,15 +29,61 @@ async function main() {
     const sourceDir = path.join(tempRepoDir, SOURCE_SUBDIR);
     console.log(`Copying template from ${sourceDir} to ${targetDir}...`);
 
-    // 2. Copy files (excluding node_modules and build artifacts)
-    // We iterate and copy so we don't overwrite the .git folder of the current repo
-    const filesToCopy = await fs.readdir(sourceDir);
-    for (const file of filesToCopy) {
-      if (['node_modules', '.next', 'dist', '.turbo', '.github'].includes(file)) continue;
-      await fs.cp(path.join(sourceDir, file), path.join(targetDir, file), {
-        recursive: true,
-        force: true,
-      });
+    // Paths that live only in this repo — never touch them
+    const LOCAL_ONLY = new Set([
+      '.git', '.github', '.devcontainer', 'scripts',
+      '.env.local', '.env.production',
+      'node_modules', '.next', '.pnpm-store',
+      'playwright-report', 'pnpm-lock.yaml',
+    ]);
+
+    // Recursively removes files/dirs in dstDir that no longer exist in srcDir
+    async function removeOrphans(srcDir, dstDir) {
+      let dstEntries;
+      try {
+        dstEntries = await fs.readdir(dstDir);
+      } catch {
+        return;
+      }
+      const srcEntries = new Set(await fs.readdir(srcDir));
+      for (const entry of dstEntries) {
+        const dstPath = path.join(dstDir, entry);
+        if (!srcEntries.has(entry)) {
+          console.log(`Removing ${path.relative(targetDir, dstPath)} (removed from upstream)...`);
+          await fs.rm(dstPath, { recursive: true, force: true });
+        } else {
+          const stat = await fs.stat(path.join(srcDir, entry));
+          if (stat.isDirectory()) {
+            await removeOrphans(path.join(srcDir, entry), dstPath);
+          }
+        }
+      }
+    }
+
+    // 2. Copy files from upstream and remove orphans within each copied directory
+    const UPSTREAM_SKIP = new Set(['node_modules', '.next', 'dist', '.turbo', '.github']);
+    const upstreamTopLevel = new Set();
+    const upstreamEntries = await fs.readdir(sourceDir);
+    for (const file of upstreamEntries) {
+      if (UPSTREAM_SKIP.has(file)) continue;
+      upstreamTopLevel.add(file);
+      const srcPath = path.join(sourceDir, file);
+      const dstPath = path.join(targetDir, file);
+      await fs.cp(srcPath, dstPath, { recursive: true, force: true });
+      const stat = await fs.stat(srcPath);
+      if (stat.isDirectory()) {
+        await removeOrphans(srcPath, dstPath);
+      }
+    }
+
+    // Remove top-level entries not in upstream and not locally owned
+    const targetEntries = await fs.readdir(targetDir);
+    for (const entry of targetEntries) {
+      if (LOCAL_ONLY.has(entry) || upstreamTopLevel.has(entry)) continue;
+      // Root files copied separately — handled below
+      if (['LICENSE', '.oxfmtrc.jsonc'].includes(entry)) continue;
+      console.log(`Removing ${entry} (not in upstream)...`);
+      await fs.rm(path.join(targetDir, entry), { recursive: true, force: true });
     }
 
     // 2.5 Copy root configuration files from the cloned repo
