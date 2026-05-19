@@ -1,13 +1,14 @@
 'use client';
 
 import {
+  GaugeIcon,
   MessageSquareIcon,
   PanelLeftIcon,
   PenSquareIcon,
   TrashIcon,
 } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import type { User } from 'next-auth';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -45,6 +46,7 @@ import {
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
 
 export function AppSidebar({ user }: { user: User | undefined }) {
+  const pathname = usePathname();
   const router = useRouter();
   const { setOpenMobile, toggleSidebar } = useSidebar();
   const { mutate } = useSWRConfig();
@@ -106,12 +108,27 @@ export function AppSidebar({ user }: { user: User | undefined }) {
               <SidebarMenu>
                 <SidebarMenuItem>
                   <SidebarMenuButton
-                    className="h-8 rounded-lg border border-sidebar-border text-[13px] text-sidebar-foreground/70 transition-colors duration-150 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
+                    isActive={pathname === '/'}
+                    tooltip="Usage"
+                    className="rounded-lg text-[13px] transition-colors duration-150"
                     onClick={() => {
                       setOpenMobile(false);
                       router.push('/');
                     }}
-                    tooltip="New Chat"
+                  >
+                    <GaugeIcon className="size-4" />
+                    <span className="font-medium">Usage</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    isActive={pathname.startsWith('/chat')}
+                    tooltip="New chat"
+                    className="rounded-lg text-[13px] transition-colors duration-150"
+                    onClick={() => {
+                      setOpenMobile(false);
+                      router.push('/chat');
+                    }}
                   >
                     <PenSquareIcon className="size-4" />
                     <span className="font-medium">New chat</span>
